@@ -76,3 +76,68 @@ void* ht_get(ht* table, const char* key) {
     
     return NULL;
 }
+
+const char* ht_set(ht* table, 
+                   const char* key, 
+                   void* value) {
+
+        assert(value != NULL);
+        if (value == NULL) {
+            return NULL;
+        }
+
+        // if length will exceed half of current
+        // capacity, expand it
+        if (table->length >= table->capacity / 2) {
+            if (!ht_expand(table)) {
+                return NULL;
+            }
+        }
+
+        // set entry and update length
+        return ht_set_entry(table->entires, 
+                            table->capacity,
+                            key, value,
+                            &table->length);
+}
+// set an entry without expanding table 
+static const char* ht_set-entry(ht_entry* entries, 
+                                size_t capacity,
+                                const char* key,
+                                void* value,
+                                size_t* plength) {
+    // AND hash with capacity minus 1 to ensure
+    // it's within entries array
+    uint64_t hash = hash_key(key);
+    size_t index = (size_t)(hash & (uint64_t)(capacity -1));
+
+    // Loop till we find an empty array
+    while (entries[index].key != NULL) {
+        if (strcmp(key, entries[index].key) == 0) {
+            // Found key, update value
+            entries[index].value = value;
+            return entries[index].key;
+        }
+
+        // key wasn't in the slot
+        index++;
+        if (index >= capacity) {
+            index = 0;
+        }
+    }
+
+    if (plength != NULL) {
+        key = strdup(key);
+        if (key == NULL) {
+            return NULL;
+        }
+        (*plength)++;
+    }
+
+    entries[index].key = (char*)key;
+    entries[index].value = value;
+    return key;
+}
+    
+
+
