@@ -101,7 +101,7 @@ const char* ht_set(ht* table,
                             &table->length);
 }
 // set an entry without expanding table 
-static const char* ht_set-entry(ht_entry* entries, 
+static const char* ht_set_entry(ht_entry* entries, 
                                 size_t capacity,
                                 const char* key,
                                 void* value,
